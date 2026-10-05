@@ -31,5 +31,5 @@ gridView = view( aluGrid( domain, dimgrid=2 ) )
 
 os.makedirs("sw", exist_ok=True)
 
-Model = model(gridView, g=1)
+Model = model(gridView, order, g=1, problem="dambreak", wb=True)
 evolve(gridView, order, Model, "sw/wb",  limiter="MinMod",  maxLevel=-1)

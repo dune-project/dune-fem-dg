@@ -3,6 +3,7 @@
 from dune.grid import cartesianDomain, yaspGrid
 from dune.fem.space import lagrange, dgonb
 from ufl import *
+from dune.ufl import cell
 
 def modelOrig(gridView, order, g, topo, T, U, bndConditions):
     dim = 2
@@ -101,7 +102,7 @@ def modelWB(gridView, g, topo, T, U, bndConditions):
     return Model
 
 def model(gridView, order, g, problem, wb):
-    x = SpatialCoordinate(triangle)
+    x = SpatialCoordinate(cell(gridView.dimGrid))
     if problem == "LeVeque":
         # example 7.1 from
         # https://www.sciencedirect.com/science/article/pii/S0021999198960582

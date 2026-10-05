@@ -73,7 +73,10 @@ struct WB : public Dune::Fem::DGAdvectionFluxPythonUserDefine< ModelImp >
     model().setEntity(left.entity());
     return std::max(speedL,speedR)*faceArea;
   }
-  private:
+
+  using BaseType::model;
+
+  protected:
   template< class LocalEvaluation >
   double
   llf( const LocalEvaluation& eval,
@@ -105,6 +108,5 @@ struct WB : public Dune::Fem::DGAdvectionFluxPythonUserDefine< ModelImp >
     return maxspeed;
   }
 
-  using BaseType::model;
   double g_;
 };
