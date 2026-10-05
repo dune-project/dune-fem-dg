@@ -5,6 +5,7 @@ from dune.fem.space import dgonb
 from dune.alugrid import aluCubeGrid
 from dune.femdg import BndValue, BndFlux_v, BndFlux_c
 from ufl import *
+from dune.ufl import cell
 
 def ShallowWater(topo,g):
     dim = 2
@@ -56,7 +57,7 @@ def bgModel(OrigModel,space):
     # here bg = C-B
     # toPrim(th)   = th+bg+B = th + C-B + B = th + C
     # toCons(th+C) = th+C-bg-B = th+C - (C-B) - B = th+C-C+B-B=th
-    x = SpatialCoordinate(triangle)
+    x = SpatialCoordinate(space)
     bg_h = OrigModel.bg_h
     class Model(OrigModel):
         def toCons(V):
@@ -101,7 +102,7 @@ def bgModel(OrigModel,space):
 # https://www.sciencedirect.com/science/article/pii/S0021999198960582
 def leVeque(dim, polOrder):
     eta = 1
-    x = SpatialCoordinate(triangle)
+    x = SpatialCoordinate(cell(dim))
     if dim == 1:
         topography = lambda x: conditional(abs(x[0]-0.5)<0.1, 1./4.*(cos(10*pi*(x[0]-0.5))+1), 0)
         initial = conditional(abs(x[0]-0.15)<0.05,eta+0.2,eta)
