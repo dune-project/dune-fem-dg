@@ -117,6 +117,10 @@ namespace Fem
     // discrete function storing the adaptation indicator information
     typedef typename Traits::AdaptationHandlerType                   AdaptationType;
 
+    // check that ModelType and AdvectionFluxType::ModelType are the same,
+    // otherwise code will not compile with lengthy error message
+    static_assert( std::is_same< ModelType, typename AdvectionFluxType::ModelType > :: value, "ModelType and AdvectionFluxType::ModelType differ!");
+
   public:
     /**
      * \brief constructor
