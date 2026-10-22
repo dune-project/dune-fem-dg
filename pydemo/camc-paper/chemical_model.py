@@ -2,6 +2,7 @@ from ufl import *
 from dune.ufl import DirichletBC
 from dune.fem.space import lagrange
 from dune.fem.scheme import galerkin
+from dune.femdg import BndValue
 
 def model(gridView,order):
     def computeVelocity():
@@ -45,7 +46,7 @@ def model(gridView,order):
             def S(t,x,U,DU):
                 return Model.S_e(t,x,U)[0]
 
-        boundary = {range(1,5): as_vector([0,0,0])}
+        boundary = {range(1,5): BndValue(as_vector([0,0,0]))}
 
     Model.U0 = [0,0,0]
     Model.endTime = 10

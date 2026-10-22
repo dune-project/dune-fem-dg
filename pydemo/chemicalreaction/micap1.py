@@ -13,6 +13,7 @@ from dune.femdg.rk import femdgStepper
 from dune.grid import reader
 from dune.fem import parameter
 from dune.fem.operator import linear as linearOperator
+from dune.femdg import BndValue
 
 #gridView = cubeGrid(cartesianDomain([0,0],[1,1],[50,50]))
 domain = (reader.gmsh, "circlemeshquad.msh")
@@ -167,9 +168,7 @@ class Model:
         # U should be positive
         #return conditional( phi>=0,1,0)*conditional(cu>=0,1,0)*conditional(cb>=0,1,0)
         return conditional(U[0]>1e-10,1,0)*conditional(U[1]>=0,1,0)*conditional(U[2]>=-1e-10,1,0)
-    def dirichletValue(t,x,u):
-        return Model.initial
-    boundary = {1: dirichletValue}
+    boundary = {1: BndValue(Model.initial)}
     endTime = 250 * secperhour
     name = "micap"
 

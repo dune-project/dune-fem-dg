@@ -1,12 +1,13 @@
 from ufl import *
 from dune.ufl import Space
+from dune.femdg import BndValue, BndFlux_v, BndFlux_c
 class Transport1D:
     dimRange = 1
 
     def F_c(t,x,U):
         return as_matrix( [ [U[0], 0] ] )
 
-    boundary = {range(1,5): lambda t,x,u: u}
+    boundary = {range(1,5): BndValue(lambda t,x,u: u)}
 
     def maxWaveSpeed(t,x,U,n):
         return abs(n[0])
@@ -50,15 +51,17 @@ def LinearAdvectionDiffusion1DMixed(v,eps,bnd):
         def zeroDiffFlux(t,x,u,du,n):
             return 0
         if v is not None and eps is not None:
-            boundary = {(1,2): dirichletValue, (3,4): [zeroFlux,zeroDiffFlux] }
+            boundary = {(1,2): BndValue(dirichletValue),
+                        (3,4): [BndFlux_c(zeroFlux),BndFlux_v(zeroDiffFlux)] }
         else:
-            boundary = {(1,2): dirichletValue, (3,4): zeroFlux }
+            boundary = {(1,2): BndValue(dirichletValue),
+                        (3,4): BndFlux_c(zeroFlux) }
     return Model
 def LinearAdvectionDiffusion1DDirichlet(v,eps,bnd):
     class Model(LinearAdvectionDiffusion1D(v,eps)):
         def dirichletValue(t,x,u):
             return bnd(t,x)
-        boundary = { range(1,5): dirichletValue }
+        boundary = { range(1,5): BndValue(dirichletValue) }
     return Model
 
 # burgers problems still need to be adapted to new API
@@ -67,7 +70,7 @@ class Burgers1D:
     def F_c(t,x,U):
         return as_matrix( [ [U[0]*U[0]/2, 0] ] )
 
-    boundary = {range(1,5): lambda t,x,u: u}
+    boundary = {range(1,5): BndValue(lambda t,x,u: u)}
 
     def maxWaveSpeed(t,x,U,n):
         return abs(U[0]*n[0])

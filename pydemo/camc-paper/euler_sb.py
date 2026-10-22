@@ -1,5 +1,6 @@
 import os, sys
 from argparse import ArgumentParser
+from dune.femdg import BndFlux_c
 
 parser = ArgumentParser()
 parser.add_argument('level', type=int)
@@ -37,9 +38,8 @@ elif grid == "poly":
     from dune.polygongrid import polygonGrid as gridPoly
     Model.domain = (reader.dgf, "shockvortex_poly.dgf")
     grid = lambda domain, dimgrid: gridPoly( Model.domain, dualGrid=True )
-    Model.boundary  = {1: lambda t,x,U,n:
-            conditional(x[0]<-0.399,
-                        Model.F_c(t,x,U)*n, noFlowFlux(U,n))
+    Model.boundary  = {1: BndFlux_c(lambda t,x,U,n: conditional(x[0]<-0.399,
+                        Model.F_c(t,x,U)*n, noFlowFlux(U,n)))
                       }
 
 from dune.fem.view import adaptiveLeafGridView as view

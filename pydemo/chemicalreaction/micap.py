@@ -11,6 +11,7 @@ from dune.femdg import femDGOperator
 from dune.femdg.rk import femdgStepper
 from dune.grid import reader, Marker
 from dune.fem import parameter, adapt
+from dune.femdg import BndValue
 
 import timeit
 
@@ -201,7 +202,7 @@ class Model:
         return conditional(U[0]>1e-10,1,0)*conditional(U[1]>=0,1,0)*conditional(U[2]>=0,1,0)
     def dirichletValue(t,x,u):
         return Model.initial
-    boundary = {1: dirichletValue}
+    boundary = {1: BndValue(Model.initial)}
     endTime = 250 * secperhour
     name = "micap"
 

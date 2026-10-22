@@ -4,6 +4,7 @@ from ufl import *
 from dune.common import FieldVector
 from dune.grid import reader, cartesianDomain
 from dune.fem.function import gridFunction
+from dune.femdg import BndValue, BndFlux_c
 
 def model(problem, dim=2, **kwargs):
     cmpE = dim+1
@@ -74,8 +75,8 @@ def model(problem, dim=2, **kwargs):
             m = as_vector([U[1],U[2]])
             mref = m - 2*dot(m,n)*n
             return as_vector([U[0],*mref,U[3]])
-        Model.boundary = {3: lambda t,x,U: reflect(U,[0,-1]),
-                          4: lambda t,x,U: reflect(U,[0,1])}
+        Model.boundary = {3: BndValue(lambda t,x,U: reflect(U,[0,-1])),
+                          4: BndValue(lambda t,x,U: reflect(U,[0,1]))}
 
         Model.domain = (reader.dgf, "kh.dgf")
         Model.endTime = 1.5
@@ -128,9 +129,9 @@ def model(problem, dim=2, **kwargs):
             uRot[ 1 ] = -uRot[ 1 ]
             return as_vector( rotateBack(uRot, n) )
 
-        Model.boundary = {1: lambda t,x,u: U_m,
-                          2: lambda t,x,u: U_p,
-                          3: lambda t,x,u,n,k: reflect(u,n)}
+        Model.boundary = {1: BndValue(lambda t,x,u: U_m),
+                          2: BndValue(lambda t,x,u: U_p),
+                          3: BndValue(lambda t,x,u,n: reflect(u,n))}
 
         if problem == "SBR":
             def source(t,x,U,DU):
@@ -162,13 +163,14 @@ def model(problem, dim=2, **kwargs):
             return [ u[0], n[0]*u[1] + n[1]*u[2], -n[1]*u[1] + n[0]*u[2], u[3] ]
         def rotateBack(u, n):
             return [ u[0], n[0]*u[1] - n[1]*u[2],  n[1]*u[1] + n[0]*u[2], u[3] ]
-        def reflect(t,x,u,n,k):
+        def reflect(t,x,u,n):
             uRot = rotateForth(u, n)
             uRot[ 1 ] = -uRot[ 1 ]
             return as_vector( rotateBack(uRot, n) )
-        Model.boundary = {range(5): lambda t,x,u,n,k: conditional(x[0]<1e-5,Model.toCons(Vl),
-                                      conditional(x[0]>1-1e-5,Model.toCons(Vr),
-                                        reflect(t,x,u,n,k) )) }
+        Model.boundary = {range(5): BndValue(lambda t,x,u,n:
+                                       conditional(x[0]<1e-5,Model.toCons(Vl),
+                                       conditional(x[0]>1-1e-5,Model.toCons(Vr),
+                                       reflect(t,x,u,n) )) )}
         def chorin(gv,t):
             gf = gv.function("chorin","chorin.hh", Vl,Vr,Model.gamma,x0,t,name="chorin")
             lgf = gf.localFunction()
