@@ -4,7 +4,7 @@ from dune.ufl import DirichletBC
 from dune.grid import structuredGrid
 from dune.fem.space import lagrange, dgonb
 from dune.fem.scheme import galerkin
-from dune.femdg import femDGOperator
+from dune.femdg import femDGOperator, BndValue
 from dune.femdg.rk import femdgStepper
 
 gridView = structuredGrid([0,0],[2*math.pi,2*math.pi],[50,50])
@@ -40,7 +40,7 @@ class Model:
     def physical(t,x,U):
         return conditional(U[0]>=0,1,0)*conditional(U[1]>=0,1,0)*\
                conditional(U[2]>=0,1,0)
-    boundary = {range(1,5): as_vector([0,0,0])}
+    boundary = {range(1,5): BndValue(as_vector([0,0,0]))}
 
 space    = dgonb( gridView, order=3, dimRange=3)
 u_h      = space.interpolate([0,0,0], name='u_h')

@@ -5,7 +5,7 @@ from dune.alugrid import aluCubeGrid as Grid
 import dune.fem
 from dune.fem import parameter
 from dune.femdg.testing import run
-
+from dune.femdg import BndValue
 
 def problem():
     gridView = Grid(cartesianDomain([0,0],[1,1],[25,25]))
@@ -58,7 +58,7 @@ def problem():
                    conditional(U[2]>=0.,1,0)
         def dirichletValue(t,x,u):
             return as_vector(Model.dimRange*[0])
-        boundary = {(1,2,3,4): dirichletValue}
+        boundary = {(1,2,3,4): BndValue(dirichletValue)}
 
     Model.initial=as_vector([0,0,0])
     Model.domain=gridView

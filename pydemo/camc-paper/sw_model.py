@@ -4,6 +4,7 @@ from dune.grid import cartesianDomain, yaspGrid
 from dune.fem.space import lagrange, dgonb
 from ufl import *
 from dune.ufl import cell
+from dune.femdg import BndValue
 
 def modelOrig(gridView, order, g, topo, T, U, bndConditions):
     dim = 2
@@ -110,7 +111,7 @@ def model(gridView, order, g, problem, wb):
         eta = conditional(abs(x[0]-0.1)<0.05,1.01,1) # this is the free surface
         U0 = [eta,0,0]
         endTime = 2
-        boundary = {range(1,5): lambda t,x,u: u}
+        boundary = {range(1,5): BndValue(lambda t,x,u: u)}
     elif problem == "beach":
         # J.A. Zelt. Tsunamis: the response of harbors with sloping boundaries to long wave exitation.
         # Tech. Rep. KH-R-47 1986; California Institute of Technology., Laboratory of Hydraulics and
@@ -126,12 +127,12 @@ def model(gridView, order, g, problem, wb):
         eta = h(0)+topography
         U0 = [eta,0,0]
         endTime = 2
-        boundary = {range(1,5): lambda t,x,u: u}
+        boundary = {range(1,5): BndValue(lambda t,x,u: u)}
     elif problem == "dambreak":
         topography = 0
         eta = conditional( x[0] < 0.5, 1, 0.5 )
         U0 = [eta,0,0]
         endTime = 0.2
-        boundary = {range(1,5): lambda t,x,u: u}
+        boundary = {range(1,5): BndValue(lambda t,x,u: u)}
     return modelWB(gridView,g,topography,endTime,U0,boundary) if wb\
            else modelOrig(gridView,order,g,topography,endTime,U0,boundary)

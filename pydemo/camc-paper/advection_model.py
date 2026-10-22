@@ -1,5 +1,6 @@
 from ufl import *
 from dune.ufl import cell
+from dune.femdg import BndValue
 
 # Basic model for hyperbolic conservation law
 def model(dim):
@@ -50,7 +51,7 @@ def model(dim):
                 return 0
 
         # simple 'dirchlet' boundary conditions on all boundaries
-        boundary = {range(1,5): lambda t,x,U: as_vector([0])}
+        boundary = {range(1,5): BndValue(as_vector([0]))}
 
     if dim == 2:
         # cube [0.6,0.8] x [0.2,0.4]
